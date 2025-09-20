@@ -16,6 +16,7 @@ MAKEFILE_HEADER = """\
 ## Makefile
 ##"""
 
+DEFAULT_CC = "clang-20"
 DEFAULT_CFLAGS = "-Werror -Wextra"
 CRITERION_FLAGS = "-lcriterion --coverage"
 
@@ -42,6 +43,9 @@ def generate_makefile(
     makefile = []
     makefile.append(generate_makefile_header(project_name))
     makefile.append("\n\n")
+
+    # CC
+    makefile.append(f"CC = {DEFAULT_CC}\n\n")
 
     # CFLAGS
     cflags = DEFAULT_CFLAGS
@@ -86,12 +90,12 @@ def generate_makefile(
 
     # Binary rule
     makefile.append("$(NAME): $(OBJ)\n")
-    makefile.append("\tgcc -o $(NAME) $(OBJ) -g $(CFLAGS)\n\n")
+    makefile.append("\t$(CC) -o $(NAME) $(OBJ) -g $(CFLAGS)\n\n")
 
     # Test rule if tests exist
     if test_files:
         makefile.append("tests_run: $(TEST_OBJ)\n")
-        makefile.append(f"\tgcc -o $(TEST_NAME) $(TEST_OBJ) -g $(CFLAGS) {CRITERION_FLAGS}\n")
+        makefile.append(f"\t$(CC) -o $(TEST_NAME) $(TEST_OBJ) -g $(CFLAGS) {CRITERION_FLAGS}\n")
         makefile.append("\t./$(TEST_NAME)\n")
         makefile.append("\tgcovr --exclude tests/\n")
         makefile.append("\tgcovr --exclude tests/ --branches\n\n")
@@ -99,7 +103,7 @@ def generate_makefile(
     # Object compilation rule with directory creation
     makefile.append("$(BUILD_DIR)/%.o: %.c\n")
     makefile.append("\t@mkdir -p $(dir $@)\n")
-    makefile.append("\tgcc $(CFLAGS) -c $< -o $@\n\n")
+    makefile.append("\t$(CC) $(CFLAGS) -c $< -o $@\n\n")
 
     # Clean rules
     makefile.append("clean:\n")
@@ -118,8 +122,20 @@ def generate_makefile(
 
     makefile.append("re: fclean all\n\n")
 
+    # cs rule for coding style
+    makefile.append("cs: clean fclean\n")
+    makefile.append("\tcoding-style . .\n")
+    makefile.append("\tcat *.log\n")
+    makefile.append("\tsudo rm *.log\n\n")
+
+    # ban rule for banned functions
+    makefile.append("ban:\n")
+    makefile.append("\tbanned_functions write\n\n")
+
     # Debug rule to show structure
     makefile.append("debug:\n")
+    makefile.append("\t@echo \"CC: $(CC)\"\n")
+    makefile.append("\t@echo \"CFLAGS: $(CFLAGS)\"\n")
     makefile.append("\t@echo \"SRC: $(SRC)\"\n")
     makefile.append("\t@echo \"OBJ: $(OBJ)\"\n")
     if test_files:
@@ -129,10 +145,10 @@ def generate_makefile(
     makefile.append("\t@echo \"BUILD_DIR: $(BUILD_DIR)\"\n\n")
 
     # PHONY
-    phony_targets = "fclean re all debug"
+    phony_targets = "fclean re all cs ban debug"
     if test_files:
         phony_targets += " tests_run"
-    
+
     makefile.append(f".PHONY: {phony_targets}\n")
 
     return "".join(makefile)
@@ -261,6 +277,7 @@ def print_usage() -> None:
     print("  python3 generate.py my_project my_binary src/main.c src/file.c")
     print("  python3 generate.py my_project --src src/core/main.c,src/utils/helper.c --tests tests/test_core.c")
     print("\nFeatures:")
+    print("  - Uses clang-20 as default compiler")
     print("  - Creates build/ directory for .o files")
     print("  - Preserves source directory structure in build/")
     print("  - EPITECH coding-style compliant")
@@ -307,6 +324,7 @@ def main() -> None:
             print(f"[!] Warning: '{test}' is not a .c test file")
 
     print(f"[+] Generating Makefile for project: {config['project_name']}")
+    print(f"[+] Compiler: {DEFAULT_CC}")
     print(f"[+] Binary name: {config['binary_name']}")
     print(f"[+] Source files: {', '.join(config['src_files'])}")
     if config["test_files"]:
