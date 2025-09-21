@@ -3,6 +3,10 @@
 import sys
 import os
 from datetime import datetime
+from colorama import init, Fore, Style
+
+# Initialize colorama
+init(autoreset=True)
 
 # =============================================================================
 # Constants
@@ -23,6 +27,10 @@ CRITERION_FLAGS = "-lcriterion --coverage"
 # =============================================================================
 # Helper Functions
 # =============================================================================
+
+def print_colored(message: str, color: str = Fore.WHITE, style: str = Style.NORMAL) -> None:
+    """Print a colored message."""
+    print(f"{style}{color}{message}{Style.RESET_ALL}")
 
 def generate_makefile_header(project_name: str) -> str:
     """Generate Makefile header."""
@@ -157,7 +165,7 @@ def write_makefile(content: str, output_file: str = "Makefile") -> None:
     """Write the Makefile to disk."""
     with open(output_file, "w") as f:
         f.write(content)
-    print(f"[+] Makefile generated: {output_file}")
+    print_colored(f"[+] Makefile generated: {output_file}", Fore.GREEN)
 
 # =============================================================================
 # Argument parsing
@@ -186,7 +194,7 @@ def parse_arguments(args: list[str]) -> dict:
                 config["project_name"] = args[i + 1]
                 i += 2
             else:
-                print("[!] Error: --name requires a value")
+                print_colored("[!] Error: --name requires a value", Fore.RED)
                 return None
 
         elif arg == "--binary" or arg == "-b":
@@ -194,7 +202,7 @@ def parse_arguments(args: list[str]) -> dict:
                 config["binary_name"] = args[i + 1]
                 i += 2
             else:
-                print("[!] Error: --binary requires a value")
+                print_colored("[!] Error: --binary requires a value", Fore.RED)
                 return None
 
         elif arg == "--src" or arg == "-s":
@@ -206,7 +214,7 @@ def parse_arguments(args: list[str]) -> dict:
                     config["src_files"].append(src_arg)
                 i += 2
             else:
-                print("[!] Error: --src requires a value")
+                print_colored("[!] Error: --src requires a value", Fore.RED)
                 return None
 
         elif arg == "--tests" or arg == "-t":
@@ -218,7 +226,7 @@ def parse_arguments(args: list[str]) -> dict:
                     config["test_files"].append(test_arg)
                 i += 2
             else:
-                print("[!] Error: --tests requires a value")
+                print_colored("[!] Error: --tests requires a value", Fore.RED)
                 return None
 
         elif arg == "--include" or arg == "-I":
@@ -230,7 +238,7 @@ def parse_arguments(args: list[str]) -> dict:
                     config["include_dirs"] = [include_arg]
                 i += 2
             else:
-                print("[!] Error: --include requires a value")
+                print_colored("[!] Error: --include requires a value", Fore.RED)
                 return None
 
         elif arg == "--flags" or arg == "-f":
@@ -238,11 +246,11 @@ def parse_arguments(args: list[str]) -> dict:
                 config["extra_flags"] = args[i + 1].split()
                 i += 2
             else:
-                print("[!] Error: --flags requires a value")
+                print_colored("[!] Error: --flags requires a value", Fore.RED)
                 return None
 
         elif arg.startswith("-"):
-            print(f"[!] Error: Unknown option {arg}")
+            print_colored(f"[!] Error: Unknown option {arg}", Fore.RED)
             return None
         else:
             # If no options are specified, treat as positional args
@@ -262,27 +270,29 @@ def parse_arguments(args: list[str]) -> dict:
 
 def print_usage() -> None:
     """Print usage instructions."""
-    print("Usage: python3 generate.py [options] <project_name> [binary_name] [sources...]")
-    print("\nOptions:")
-    print("  -n, --name <name>        Project name")
-    print("  -b, --binary <name>      Binary name (default: project name)")
-    print("  -s, --src <files>        Source files (comma-separated)")
-    print("  -t, --tests <files>      Test files for Criterion (comma-separated)")
-    print("  -I, --include <dirs>     Include directories (default: ./include)")
-    print("  -f, --flags <flags>      Additional compiler flags")
-    print("\nExamples:")
-    print("  python3 generate.py my_project")
-    print("  python3 generate.py --name my_project --binary my_prog --src src/main.c,src/utils.c")
-    print("  python3 generate.py my_project --tests tests/test_main.c,tests/test_utils.c")
-    print("  python3 generate.py my_project my_binary src/main.c src/file.c")
-    print("  python3 generate.py my_project --src src/core/main.c,src/utils/helper.c --tests tests/test_core.c")
-    print("\nFeatures:")
-    print("  - Uses clang-20 as default compiler")
-    print("  - Creates build/ directory for .o files")
-    print("  - Preserves source directory structure in build/")
-    print("  - EPITECH coding-style compliant")
-    print("  - Criterion unit tests support with coverage")
-    print("  - Automatic main.c exclusion in tests")
+    print_colored("Usage: python3 generate.py [options] <project_name> [binary_name] [sources...]", Fore.CYAN)
+    print_colored("\nOptions:", Fore.YELLOW)
+    print_colored("  -n, --name <name>        Project name", Fore.GREEN)
+    print_colored("  -b, --binary <name>      Binary name (default: project name)", Fore.GREEN)
+    print_colored("  -s, --src <files>        Source files (comma-separated)", Fore.GREEN)
+    print_colored("  -t, --tests <files>      Test files for Criterion (comma-separated)", Fore.GREEN)
+    print_colored("  -I, --include <dirs>     Include directories (default: ./include)", Fore.GREEN)
+    print_colored("  -f, --flags <flags>      Additional compiler flags", Fore.GREEN)
+
+    print_colored("\nExamples:", Fore.YELLOW)
+    print_colored("  python3 generate.py my_project", Fore.MAGENTA)
+    print_colored("  python3 generate.py --name my_project --binary my_prog --src src/main.c,src/utils.c", Fore.MAGENTA)
+    print_colored("  python3 generate.py my_project --tests tests/test_main.c,tests/test_utils.c", Fore.MAGENTA)
+    print_colored("  python3 generate.py my_project my_binary src/main.c src/file.c", Fore.MAGENTA)
+    print_colored("  python3 generate.py my_project --src src/core/main.c,src/utils/helper.c --tests tests/test_core.c", Fore.MAGENTA)
+
+    print_colored("\nFeatures:", Fore.YELLOW)
+    print_colored("  - Uses clang-20 as default compiler", Fore.GREEN)
+    print_colored("  - Creates build/ directory for .o files", Fore.GREEN)
+    print_colored("  - Preserves source directory structure in build/", Fore.GREEN)
+    print_colored("  - EPITECH coding-style compliant", Fore.GREEN)
+    print_colored("  - Criterion unit tests support with coverage", Fore.GREEN)
+    print_colored("  - Automatic main.c exclusion in tests", Fore.GREEN)
     sys.exit(1)
 
 # =============================================================================
@@ -299,7 +309,7 @@ def main() -> None:
 
     # Validate required fields
     if not config["project_name"]:
-        print("[!] Error: Project name is required")
+        print_colored("[!] Error: Project name is required", Fore.RED)
         print_usage()
 
     if not config["binary_name"]:
@@ -316,22 +326,22 @@ def main() -> None:
     # Validate source files
     for src in config["src_files"]:
         if not src.endswith(".c"):
-            print(f"[!] Warning: '{src}' is not a .c file")
+            print_colored(f"[!] Warning: '{src}' is not a .c file", Fore.YELLOW)
 
     # Validate test files
     for test in config["test_files"]:
         if not test.endswith(".c"):
-            print(f"[!] Warning: '{test}' is not a .c test file")
+            print_colored(f"[!] Warning: '{test}' is not a .c test file", Fore.YELLOW)
 
-    print(f"[+] Generating Makefile for project: {config['project_name']}")
-    print(f"[+] Compiler: {DEFAULT_CC}")
-    print(f"[+] Binary name: {config['binary_name']}")
-    print(f"[+] Source files: {', '.join(config['src_files'])}")
+    print_colored(f"[+] Generating Makefile for project: {config['project_name']}", Fore.GREEN)
+    print_colored(f"[+] Compiler: {DEFAULT_CC}", Fore.BLUE)
+    print_colored(f"[+] Binary name: {config['binary_name']}", Fore.BLUE)
+    print_colored(f"[+] Source files: {', '.join(config['src_files'])}", Fore.BLUE)
     if config["test_files"]:
-        print(f"[+] Test files: {', '.join(config['test_files'])}")
-        print(f"[+] Tests: Criterion with coverage enabled")
-    print(f"[+] Include directories: {', '.join(config['include_dirs'])}")
-    print(f"[+] Build directory: build/ (preserves source structure)")
+        print_colored(f"[+] Test files: {', '.join(config['test_files'])}", Fore.BLUE)
+        print_colored(f"[+] Tests: Criterion with coverage enabled", Fore.BLUE)
+    print_colored(f"[+] Include directories: {', '.join(config['include_dirs'])}", Fore.BLUE)
+    print_colored(f"[+] Build directory: build/ (preserves source structure)", Fore.BLUE)
 
     # Generate Makefile
     makefile_content = generate_makefile(
