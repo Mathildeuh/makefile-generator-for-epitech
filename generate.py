@@ -20,7 +20,7 @@ MAKEFILE_HEADER = """\
 ## Makefile
 ##"""
 
-DEFAULT_CC = "clang-20"
+DEFAULT_CC = "epiclang"
 DEFAULT_CFLAGS = "-Werror -Wextra"
 CRITERION_FLAGS = "-lcriterion --coverage"
 
@@ -125,20 +125,10 @@ def generate_makefile(
     makefile.append("\trm -f $(NAME)\n")
     if test_files:
         makefile.append("\trm -f $(TEST_NAME)\n")
-    makefile.append("\trm -Rf #*#\n")
-    makefile.append("\trm -Rf #~\n\n")
+    makefile.append("\trm -Rf *#\n")
+    makefile.append("\trm -Rf *~\n\n")
 
     makefile.append("re: fclean all\n\n")
-
-    # cs rule for coding style
-    makefile.append("cs: clean fclean\n")
-    makefile.append("\tcoding-style . .\n")
-    makefile.append("\tcat *.log\n")
-    makefile.append("\tsudo rm *.log\n\n")
-
-    # ban rule for banned functions
-    makefile.append("ban:\n")
-    makefile.append("\tbanned_functions write\n\n")
 
     # Debug rule to show structure
     makefile.append("debug:\n")
@@ -287,7 +277,7 @@ def print_usage() -> None:
     print_colored("  python3 generate.py my_project --src src/core/main.c,src/utils/helper.c --tests tests/test_core.c", Fore.MAGENTA)
 
     print_colored("\nFeatures:", Fore.YELLOW)
-    print_colored("  - Uses clang-20 as default compiler", Fore.GREEN)
+    print_colored("  - Uses epiclang as default compiler", Fore.GREEN)
     print_colored("  - Creates build/ directory for .o files", Fore.GREEN)
     print_colored("  - Preserves source directory structure in build/", Fore.GREEN)
     print_colored("  - EPITECH coding-style compliant", Fore.GREEN)
