@@ -81,7 +81,7 @@ def generate_makefile(
     makefile.append(f"NAME = {binary_name}\n\n")
 
     # BUILD DIR
-    makefile.append("BUILD_DIR = build\n\n")
+    makefile.append("BUILD_DIR = objects\n\n")
 
     # Test binary name
     if test_files:
